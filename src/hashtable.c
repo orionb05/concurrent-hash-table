@@ -1,17 +1,17 @@
-#inlcude "hashtable.h"
+#include "hashtable.h"
 
-int insert(char[] name, uint32_t salary){
+int insert(char name[], uint32_t salary){
     return 0;
 }
 
-int delete(char[] name){
+int delete(char name[]){
     return 0;
 };
 
-int updateSalary(char[] name, uint32_t salary){
+int updateSalary(char name[], uint32_t salary){
     return 0;
 };
 
-int search(char[] name){
+int search(char name[]){
     return 0;
 };

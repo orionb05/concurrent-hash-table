@@ -1,5 +1,7 @@
 // Concurrent hash table interface for key–salary mapping
 
+#include <stdint.h>
+
 typedef struct hash_struct
 {
   uint32_t hash;
@@ -8,10 +10,10 @@ typedef struct hash_struct
   struct hash_struct *next;
 } hashRecord;
 
-int insert(char[] name, uint32_t salary){};
+int insert(char name[], uint32_t salary);
 
-int delete(char[] name){};
+int delete(char name[]);
 
-int updateSalary(char[] name, uint32_t salary){};
+int updateSalary(char name[], uint32_t salary);
 
-int search(char[] name){};
+int search(char name[]);
