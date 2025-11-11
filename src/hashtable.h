@@ -1,19 +1,19 @@
+#ifndef HASHTABLE_H
+#define HASHTABLE_H
+
 // Concurrent hash table interface for key–salary mapping
 
 #include <stdint.h>
+#include <stdio.h>
 
-typedef struct hash_struct
-{
-  uint32_t hash;
-  char name[50];
-  uint32_t salary;
-  struct hash_struct *next;
-} hashRecord;
+#include "types.h"
 
-int insert(char name[], uint32_t salary);
+int insert(HashTable *table, CommandInfo *command);
 
 int delete(char name[]);
 
 int updateSalary(char name[], uint32_t salary);
 
-int search(char name[]);
+int search(HashTable *table, CommandInfo *command);
+
+int freeTable(HashTable *table);
