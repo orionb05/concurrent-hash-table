@@ -1,6 +1,8 @@
 #ifndef COMMON_H
 #define COMMON_H
 
+// Contains extra functions needed for rwlock, hashing, and logging functionalities.
+
 #include <sys/time.h>
 #include <sys/stat.h>
 #include <assert.h>

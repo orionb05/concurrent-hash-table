@@ -8,7 +8,8 @@ void PrintOutputs(CommandInfo *command, FILE *fo){
     strcpy(name, command->name);
     uint32_t salary = command->salary;
 
-    //  Format and print output based on the completed operation
+    // Format and print output based on the completed operation
+    // TO BE FILLED DURING OTHER FUNCTIONS
     switch(op){
 
         case OP_INSERT:
@@ -18,10 +19,22 @@ void PrintOutputs(CommandInfo *command, FILE *fo){
             
         case OP_UPDATE:
         case OP_DELETE:
+
         case OP_SEARCH:
+            // Salary is set to '-404' in search function if search fails
+            if(command->salary == -404){
+                printf("No Record Found\n");
+                fprintf(fo, "Inserted %s, %d\n", name, salary);
+            }
+            else{
+                printf("Found %s. Salary: %d\n", name, salary);
+                fprintf(fo, "Found %s. Salary: %d\n", name, salary);
+            }
+            break;
+
         case OP_PRINT: //maybe call this repeatedly in Print() function
         default:
-            fprintf(stderr, "Error: incorrect call to PrintOutputs");
+            fprintf(stderr, "Error: incorrect call to PrintOutputs\n");
             exit(1);
     }
 }
