@@ -5,6 +5,7 @@
 
 #include <stdint.h>
 #include <stdio.h>
+#include <string.h>
 
 #include "types.h"
 
@@ -17,3 +18,5 @@ int updateSalary(char name[], uint32_t salary);
 int search(HashTable *table, CommandInfo *command);
 
 int freeTable(HashTable *table);
+
+#endif

@@ -1,6 +1,6 @@
 # Comiples multiple .c files into chash
 
-SRCS = src/chash.c src/hashtable.c src/rwlock.c src/jenkins.c
+SRCS = src/chash.c src/hashtable.c src/rwlock.c src/logging.c src/common.c
 TARGET = chash
 
 $(TARGET): $(SRCS)

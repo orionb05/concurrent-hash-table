@@ -7,9 +7,6 @@
 #include <stdint.h>
 #include <stddef.h>
 
-// TO BE IMPLEMENTED. The insert function depends on this.
-Command* ParseCommand(void);
-
 // Provided in Assignment
 long long GetMicroTime(); 
 

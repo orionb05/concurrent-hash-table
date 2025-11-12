@@ -3,6 +3,7 @@
 
 #include <stdint.h>
 #include <stdio.h>
+#include <string.h>
 
 #include "types.h"
 
@@ -11,8 +12,8 @@
 // General output is handled by PrintOutputs while logging follows. 
 */
 
-void PrintOutputs(CommandInfo *command, FILE *fo){}
+void PrintOutputs(CommandInfo *command, FILE *fo);
 
-void PrintLog(long long timestamp, int priority, const char *message){}
+void PrintLog(long long timestamp, int priority, const char *message);
 
 #endif

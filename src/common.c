@@ -1,7 +1,4 @@
-
 #include "common.h"
-
-Command* ParseCommand(void){ return NULL };
 
 long long GetMicroTime() {  
     struct timeval te;  

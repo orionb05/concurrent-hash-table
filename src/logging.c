@@ -4,7 +4,8 @@
 void PrintOutputs(CommandInfo *command, FILE *fo){
 
     OperationType op = command->op;
-    char name[] = command->name;
+    char name[50];
+    strcpy(name, command->name);
     uint32_t salary = command->salary;
 
     //  Format and print output based on the completed operation
@@ -28,6 +29,8 @@ void PrintOutputs(CommandInfo *command, FILE *fo){
 // Outputs log info to the hash.log file
 void PrintLog(long long timestamp, int priority, const char *message){
 
+    FILE *fl;
+
     if((fl = fopen("hash.log","a")) == NULL){
         fprintf(stderr, "Error: failed opening log file");
         exit(1);
@@ -35,4 +38,6 @@ void PrintLog(long long timestamp, int priority, const char *message){
 
     // This expects that the calling function handles the dynamic message
     fprintf(fl, "%lld: THREAD %d, %s\n", timestamp, priority, message);
+
+    fclose(fl);
 }

@@ -56,3 +56,7 @@ dkms.conf
 
 # Primary executable
 chash
+
+# Testing files
+output.txt
+hash.log

@@ -5,7 +5,6 @@
 
 #include "rwlock.h"
 
-// Used 
 typedef enum {
     OP_INSERT,
     OP_UPDATE,
@@ -16,7 +15,7 @@ typedef enum {
 
 typedef struct {
     OperationType op;
-    char name[];
+    char name[50];
     uint32_t salary;
     int priority;
 } CommandInfo;
@@ -32,7 +31,7 @@ typedef struct hash_struct
 typedef struct
 {
   hashRecord *head;
-  rwlock_t *lock;
+  rwlock_t lock;
 } HashTable;
 
 #endif
