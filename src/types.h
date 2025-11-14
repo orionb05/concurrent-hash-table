@@ -18,17 +18,6 @@ typedef enum {
     OP_PRINT
 } OperationType;
 
-/*
-// Passed into core hashtable functions to provide all command arguments.
-// To be updated by argument parser for each argument.
-*/
-typedef struct {
-    OperationType op;
-    char name[50];
-    uint32_t salary;
-    int priority;
-} CommandInfo;
-
 // Base node for the hashtable
 typedef struct hash_struct
 {
@@ -37,6 +26,19 @@ typedef struct hash_struct
   uint32_t salary;
   struct hash_struct *next;
 } hashRecord;
+
+/*
+// Passed into functions to track progression of command completion and info.
+// To be updated by argument parser and hashtable logic.
+*/
+typedef struct {
+    OperationType op;
+    char name[50];
+    uint32_t salary;
+    int priority;
+    int succeeded;
+    hashRecord *record;
+} CommandInfo;
 
 // Core table components, including head and lock. Should be instantiated once.
 typedef struct

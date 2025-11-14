@@ -15,8 +15,10 @@
 
 #include "types.h"
 
-void PrintOutputs(CommandInfo *command, FILE *fo);
+void PrintUpdate(CommandInfo *command);
 
 void PrintLog(long long timestamp, int priority, const char *message);
+
+void PrintResults();
 
 #endif

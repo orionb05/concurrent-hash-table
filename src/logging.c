@@ -1,38 +1,32 @@
 #include "logging.h"
 
-// Outputs command completion info to output.txt and console
-void PrintOutputs(CommandInfo *command, FILE *fo){
+// Outputs command completion info to the console
+void PrintUpdate(CommandInfo *command){
 
     OperationType op = command->op;
-    char name[50];
-    strcpy(name, command->name);
+    char *name = command->name;
     uint32_t salary = command->salary;
+    hashRecord *record = command->record;
 
     // Format and print output based on the completed operation
-    // TO BE FILLED DURING OTHER FUNCTIONS
     switch(op){
 
         case OP_INSERT:
-            printf("Inserted %s, %d\n", name, salary);
-            fprintf(fo, "Inserted %s, %d\n", name, salary);
+            if(command->succeeded) printf("Inserted %s, %d\n", name, salary);
+            else printf("Insert failed.  Entry %d is a duplicate.\n", record->hash);
             break;
             
         case OP_UPDATE:
+            // to be filled
         case OP_DELETE:
-
+            // to be filled
         case OP_SEARCH:
-            // Salary is set to '-404' in search function if search fails
-            if(command->salary == -404){
-                printf("No Record Found\n");
-                fprintf(fo, "Inserted %s, %d\n", name, salary);
-            }
-            else{
-                printf("Found %s. Salary: %d\n", name, salary);
-                fprintf(fo, "Found %s. Salary: %d\n", name, salary);
-            }
+            if(command->succeeded) printf("Found: %s, %d\n", name, salary);
+            else printf("%s not found.\n", name);
             break;
 
-        case OP_PRINT: //maybe call this repeatedly in Print() function
+        case OP_PRINT: 
+            //maybe call this repeatedly in Print() function
         default:
             fprintf(stderr, "Error: incorrect call to PrintOutputs\n");
             exit(1);
@@ -50,7 +44,9 @@ void PrintLog(long long timestamp, int priority, const char *message){
     }
 
     // This expects that the calling function handles the dynamic message
-    fprintf(fl, "%lld: THREAD %d, %s\n", timestamp, priority, message);
+    fprintf(fl, "%lld: THREAD %d %s\n", timestamp, priority, message);
 
     fclose(fl);
 }
+
+void PrintResults(){}

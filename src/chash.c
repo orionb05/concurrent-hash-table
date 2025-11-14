@@ -17,20 +17,22 @@ int main(int argc, char *argv[]){
     rwlock_init(&table.lock);
     table.head = NULL;
 
-    // This cmd and file should be updated with each subsequent command
-    CommandInfo cmd;
-    FILE *fo;
-
-    // Set up output.txt
-    if((fo = fopen("output.txt","w")) == NULL){
-        fprintf(stderr, "Error: failed to open output file");
+    // Reset the log file
+    FILE *logFile = fopen("hash.log", "w");
+    if (logFile == NULL) {
+        perror("Error : failed to reset log file");
         exit(1);
     }
+    fclose(logFile);
+
+    // This cmd should be updated with each subsequent command
+    CommandInfo cmd = {0};
+
+    // We should def make a InitCommand() function to *reset*, *validate(error-wise)*, and *fill* each command.
 
     // Ideally the runner would collect each command and set up
     // each cmd and pass them to their respective functions.
-    // I included a insert() and search() call to show the calls.
-    // After each command, you can use PrintOutputs().
+    // I included an insert() and search() call to show the calls.
 
     cmd.op = OP_INSERT;
     cmd.salary = 40000;
@@ -38,17 +40,17 @@ int main(int argc, char *argv[]){
     cmd.priority = 1;
 
     insert(&table, &cmd);
-    PrintOutputs(&cmd, fo);
 
+    cmd = (CommandInfo){0};   
     cmd.op = OP_SEARCH;
     strcpy(cmd.name, "Foo Bar");
     cmd.priority = 2;
 
     search(&table, &cmd);
-    PrintOutputs(&cmd, fo);
+
+    //At the end, we need to do the final print outlined in webcourses->files->pa2->output.txt(bottom)
 
     freeTable(&table);
-    fclose(fo);
 
     return 0;
 }

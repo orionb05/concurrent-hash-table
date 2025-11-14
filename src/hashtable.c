@@ -30,7 +30,9 @@ void insert(HashTable *table, CommandInfo *command){
     ts_wait= GetMicroTime();
     rwlock_acquire_writelock(lock);
     ts_aqr = GetMicroTime();
+    // Simulate waiting & awakening
     if((ts_aqr - ts_wait) > 10) PrintLog(ts_wait, priority, "WAITING FOR MY TURN");
+    PrintLog(ts_aqr, priority, "AWAKENED FOR WORK");
     PrintLog(ts_aqr, priority, "WRITE LOCK ACQUIRED");
 
     // Set up for traversal over hash table
@@ -38,23 +40,23 @@ void insert(HashTable *table, CommandInfo *command){
     hashRecord *curr = head;
     hashRecord *prev = NULL;
 
-    // Navigate to a either a duplicate node or the end of the list
-    while(curr != NULL){
+    while(curr != NULL){ // Navigate to a either a duplicate node or the end of the list
 
-        if(curr->hash == hash){
+        if(curr->hash == hash){ // Found duplicate
             break;
         }
 
         prev = curr;
         curr = curr->next;
     }
-
-    // Entry already exists
-    if(curr != NULL){
+    
+    if(curr != NULL){ // Node already existed
         curr->salary = salary;
     }
-    // Entry doesn't exist
-    else{
+    else{ // New node should be made
+
+        command->succeeded = true;
+
         // Create space for new node
         if((curr = malloc(sizeof(hashRecord))) == NULL){
             fprintf(stderr, "Error: malloc failed");
@@ -71,6 +73,11 @@ void insert(HashTable *table, CommandInfo *command){
         if(prev != NULL) prev->next = curr;
         if(head == NULL) table->head = curr;
     }
+
+    // Save info in command for remaining logging
+    command->record = curr;
+
+    PrintUpdate(command);
 
     // Log and release lock
     ts_rel = GetMicroTime();
@@ -112,30 +119,34 @@ hashRecord* search(HashTable *table, CommandInfo *command){
     rwlock_acquire_readlock(lock);
     ts_aqr = GetMicroTime();
     if((ts_aqr - ts_wait) > 10) PrintLog(ts_wait, priority, "WAITING FOR MY TURN");
+    // Simulate waiting & awakening
+    PrintLog(ts_aqr, priority, "AWAKENED FOR WORK");
     PrintLog(ts_aqr, priority, "READ LOCK ACQUIRED");
 
     // Set up for traversal over hash table
     hashRecord *curr = table->head;
 
-    // Navigate to either the query node or the end of the list
-    while(curr != NULL){
+    while(curr != NULL){ // Navigate to either the query node or the end of the list
 
         if(curr->hash == hash) break;
 
         curr = curr->next;
     }
 
-    hashRecord* res = curr;
+    if(curr != NULL){ // Save info in command for remaining logging
 
-    // If search failed, use this to later notify logger
-    if(res == NULL) command->salary = -404;
+        command->succeeded = true;
+        command->record = curr;
+    }
+
+    PrintUpdate(command);
 
     // Log and release lock
     ts_rel = GetMicroTime();
     rwlock_release_readlock(lock);
     PrintLog(ts_rel, priority, "READ LOCK RELEASED");
 
-    return res;
+    return curr;
 }
 
 // Cleans malloc'd space
