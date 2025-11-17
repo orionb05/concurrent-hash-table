@@ -13,6 +13,8 @@ void insert(HashTable *table, CommandInfo *command);
 
 int delete(char name[]);
 
+void printTable(HashTable *table, CommandInfo *command);
+
 int updateSalary(char name[], uint32_t salary);
 
 hashRecord* search(HashTable *table, CommandInfo *command);

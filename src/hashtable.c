@@ -2,7 +2,8 @@
 #include "common.h"
 #include "types.h"
 #include "logging.h"
-
+#include <stdbool.h>
+#include <stdlib.h>
 
 /*
 // Takes a command and creates a new record if the name isn't
@@ -94,6 +95,56 @@ int updateSalary(char name[], uint32_t salary){
     return 0;
 }
 
+void printTable(HashTable *table, CommandInfo *command) {
+    int priority = command->priority;
+    rwlock_t *lock = &table->lock;
+
+    long long ts_wait = GetMicroTime();
+    rwlock_acquire_readlock(lock);
+    long long ts_aqr = GetMicroTime();
+
+    if ((ts_aqr - ts_wait) > 10)
+        PrintLog(ts_wait, priority, "WAITING FOR MY TURN");
+
+    PrintLog(ts_aqr, priority, "AWAKENED FOR WORK");
+    PrintLog(ts_aqr, priority, "READ LOCK ACQUIRED");
+
+    // Count nodes
+    int count = 0;
+    hashRecord *curr = table->head;
+    while (curr) {
+        count++;
+        curr = curr->next;
+    }
+
+    // Collect pointers
+    hashRecord **arr = malloc(sizeof(hashRecord*) * count);
+    curr = table->head;
+    for (int i = 0; i < count; i++) {
+        arr[i] = curr;
+        curr = curr->next;
+    }
+
+    // Sort by hash
+    int cmp(const void *a, const void *b) {
+        hashRecord *ha = *(hashRecord**)a;
+        hashRecord *hb = *(hashRecord**)b;
+        return (ha->hash > hb->hash) - (ha->hash < hb->hash);
+    }
+    qsort(arr, count, sizeof(hashRecord*), cmp);
+
+    printf("Current Database:\n");
+    for (int i = 0; i < count; i++) {
+        printf("%u,%s,%u\n", arr[i]->hash, arr[i]->name, arr[i]->salary);
+    }
+
+    free(arr);
+
+    long long ts_rel = GetMicroTime();
+    rwlock_release_readlock(lock);
+    PrintLog(ts_rel, priority, "READ LOCK RELEASED");
+}
+
 /*
 // Searches the table for the name within the command. Returns the record
 // if the name is found. Return NULL otherwise.
@@ -137,6 +188,7 @@ hashRecord* search(HashTable *table, CommandInfo *command){
 
         command->succeeded = true;
         command->record = curr;
+        command->salary = curr->salary;
     }
 
     PrintUpdate(command);

@@ -41,12 +41,34 @@ int main(int argc, char *argv[]){
 
     insert(&table, &cmd);
 
+    cmd.op = OP_INSERT;
+    cmd.salary = 25620;
+    strcpy(cmd.name, "Choclate");
+    cmd.priority = 2;
+    insert(&table, &cmd);
+
+    cmd.op = OP_INSERT;
+    cmd.salary = 2637214;
+    strcpy(cmd.name, "Ice cream");
+    cmd.priority = 3;
+    insert(&table, &cmd);
+
+    cmd.op = OP_INSERT;
+    cmd.salary = 2637214;
+    strcpy(cmd.name, "Dot cream");
+    cmd.priority = 3;
+    insert(&table, &cmd);
+
     cmd = (CommandInfo){0};   
     cmd.op = OP_SEARCH;
     strcpy(cmd.name, "Foo Bar");
     cmd.priority = 2;
-
     search(&table, &cmd);
+
+    cmd = (CommandInfo){0};
+    cmd.op = OP_PRINT;
+    cmd.priority = 3;
+    printTable(&table, &cmd);
 
     //At the end, we need to do the final print outlined in webcourses->files->pa2->output.txt(bottom)
 
