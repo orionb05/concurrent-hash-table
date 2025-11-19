@@ -11,11 +11,13 @@
 
 void insert(HashTable *table, CommandInfo *command);
 
-int delete(char name[]);
+int delete(HashTable *table, CommandInfo *command);
 
 void printTable(HashTable *table, CommandInfo *command);
 
-int updateSalary(char name[], uint32_t salary);
+int updateSalary(HashTable *table, CommandInfo *command);
+
+int cmp(const void *a, const void *b);
 
 hashRecord* search(HashTable *table, CommandInfo *command);
 
