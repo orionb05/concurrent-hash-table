@@ -17,14 +17,14 @@ void insert(HashTable *table, CommandInfo *command) {
     uint32_t salary = command->salary;
     int priority = command->priority;
 
-    int32_t hash = jenkins_one_at_a_time_hash((const uint8_t *)name, strlen(name));
+    uint32_t hash = jenkins_one_at_a_time_hash((const uint8_t *)name, strlen(name));
 
     rwlock_t *lock = &table->lock;
     long long ts_wait, ts_aqr, ts_rel;
 
     // Log the insert operation
     char msg[64];
-    snprintf(msg, sizeof(msg), "INSERT,%d,%s,%d", hash, name, salary);
+    snprintf(msg, sizeof(msg), "INSERT,%u,%s,%u", hash, name, salary);
     PrintLog(GetMicroTime(), priority, msg);
 
     // Set up rwlock and log
@@ -76,14 +76,14 @@ void insert(HashTable *table, CommandInfo *command) {
 int delete(HashTable *table, CommandInfo *command) {
     const char *name = command->name;
     int priority = command->priority;
-    int32_t hash = jenkins_one_at_a_time_hash((const uint8_t *)name, strlen(name));
+    uint32_t hash = jenkins_one_at_a_time_hash((const uint8_t *)name, strlen(name));
 
     rwlock_t *lock = &table->lock;
     long long ts_wait, ts_aqr, ts_rel;
 
     // Log the delete operation
     char msg[64];
-    snprintf(msg, sizeof(msg), "DELETE,%d,%s", hash, name);
+    snprintf(msg, sizeof(msg), "DELETE,%u,%s", hash, name);
     PrintLog(GetMicroTime(), priority, msg);
 
     // Acquire write lock
@@ -140,14 +140,14 @@ int updateSalary(HashTable *table, CommandInfo *command) {
     const char *name = command->name;
     uint32_t newSalary = command->salary;
     int priority = command->priority;
-    int32_t hash = jenkins_one_at_a_time_hash((const uint8_t *)name, strlen(name));
+    uint32_t hash = jenkins_one_at_a_time_hash((const uint8_t *)name, strlen(name));
 
     rwlock_t *lock = &table->lock;
     long long ts_wait, ts_aqr, ts_rel;
 
     // Log the update operation
     char msg[64];
-    snprintf(msg, sizeof(msg), "UPDATE,%d,%s,%d", hash, name, newSalary);
+    snprintf(msg, sizeof(msg), "UPDATE,%u,%s,%u", hash, name, newSalary);
     PrintLog(GetMicroTime(), priority, msg);
 
     // Acquire write lock
@@ -228,7 +228,7 @@ void printTable(HashTable *table, CommandInfo *command) {
 
     printf("Current Database:\n");
     for (int i = 0; i < count; i++) {
-        printf("%d,%s,%u\n", arr[i]->hash, arr[i]->name, arr[i]->salary);
+        printf("%u,%s,%u\n", arr[i]->hash, arr[i]->name, arr[i]->salary);
     }
 
     free(arr);
@@ -243,14 +243,14 @@ hashRecord* search(HashTable *table, CommandInfo *command){
     const char *name = command->name;
     int priority = command->priority;
 
-    int32_t hash = jenkins_one_at_a_time_hash((const uint8_t *)name, strlen(name));
+    uint32_t hash = jenkins_one_at_a_time_hash((const uint8_t *)name, strlen(name));
 
     rwlock_t *lock = &table->lock;
     long long ts_wait, ts_aqr, ts_rel;
 
     // Construct and save the primary log message
     char msg[64];
-    snprintf(msg, sizeof(msg), "SEARCH,%d,%s", hash, name);
+    snprintf(msg, sizeof(msg), "SEARCH,%u,%s", hash, name);
     PrintLog(GetMicroTime(), priority, msg);
 
     // Set up rwlock and log
