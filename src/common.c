@@ -2,8 +2,8 @@
 
 long long GetMicroTime() {  
     struct timeval te;  
-    gettimeofday(&te, NULL); // get current time  
-    long long microseconds = (te.tv_sec * 1000000) + te.tv_usec; // calculate milliseconds  
+    gettimeofday(&te, NULL); // get current time 
+    long long microseconds = (te.tv_sec * 1000000) + te.tv_usec;// calculate milliseconds  
     return microseconds;  
 } 
 
@@ -21,15 +21,21 @@ void Spin(int howlong) {
 }
 
 int32_t jenkins_one_at_a_time_hash(const uint8_t* key, size_t length) {
-  size_t i = 0;
-  uint32_t hash = 0;
-  while (i != length) {
-    hash += key[i++];
-    hash += hash << 10;
-    hash ^= hash >> 6;
-  }
-  hash += hash << 3;
-  hash ^= hash >> 11;
-  hash += hash << 15;
-  return hash;
+    uint32_t hash = 0;
+    
+    // THIS LOOP MUST BE HERE - 50,000 iterations
+    for (int iter = 0; iter < 50000; iter++) {
+        size_t i = 0;
+        hash = 0;
+        while (i != length) {
+            hash += key[i++];
+            hash += hash << 10;
+            hash ^= hash >> 6;
+        }
+        hash += hash << 3;
+        hash ^= hash >> 11;
+        hash += hash << 15;
+    }
+    
+    return (int32_t)hash;
 }

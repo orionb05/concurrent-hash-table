@@ -17,8 +17,6 @@ void printTable(HashTable *table, CommandInfo *command);
 
 int updateSalary(HashTable *table, CommandInfo *command);
 
-int cmp(const void *a, const void *b);
-
 hashRecord* search(HashTable *table, CommandInfo *command);
 
 int freeTable(HashTable *table);

@@ -5,16 +5,13 @@
 #include <stdbool.h>
 #include <stdlib.h>
 
-/*
-// Takes a command and creates a new record if the name isn't
-// already within the table. Otherwise, it updates the record
-// with the new name.
-*/
+// Comparison function for sorting hash records
 int cmp(const void *a, const void *b) {
-        hashRecord *ha = *(hashRecord**)a;
-        hashRecord *hb = *(hashRecord**)b;
-        return (ha->hash > hb->hash) - (ha->hash < hb->hash);
-    }
+    hashRecord *ha = *(hashRecord**)a;
+    hashRecord *hb = *(hashRecord**)b;
+    return (ha->hash > hb->hash) - (ha->hash < hb->hash);
+}
+
 void insert(HashTable *table, CommandInfo *command) {
     const char *name = command->name;
     uint32_t salary = command->salary;
@@ -31,22 +28,51 @@ void insert(HashTable *table, CommandInfo *command) {
     PrintLog(GetMicroTime(), priority, msg);
 
     // Set up rwlock and log
-    ts_wait= GetMicroTime();
+    ts_wait = GetMicroTime();
     rwlock_acquire_writelock(lock);
     ts_aqr = GetMicroTime();
     if((ts_aqr - ts_wait) > 10) PrintLog(ts_wait, priority, "WAITING FOR MY TURN");
     PrintLog(ts_aqr, priority, "AWAKENED FOR WORK");
     PrintLog(ts_aqr, priority, "WRITE LOCK ACQUIRED");
 
-    // Insertion logic...
-    // (similar to the previous insert logic)
+    // Check for duplicate
+    hashRecord *curr = table->head;
+    while(curr != NULL) {
+        if(curr->hash == hash) {
+            // Duplicate found
+            command->succeeded = false;
+            command->record = curr;
+            PrintUpdate(command);
+            
+            ts_rel = GetMicroTime();
+            rwlock_release_writelock(lock);
+            PrintLog(ts_rel, priority, "WRITE LOCK RELEASED");
+            return;
+        }
+        curr = curr->next;
+    }
+
+    // Create new record
+    hashRecord *newRecord = (hashRecord*)malloc(sizeof(hashRecord));
+    if (newRecord == NULL) {
+        fprintf(stderr, "Error: malloc failed\n");
+        exit(1);
+    }
+    newRecord->hash = hash;
+    strcpy(newRecord->name, name);
+    newRecord->salary = salary;
+    newRecord->next = table->head;
+    table->head = newRecord;
+
+    command->succeeded = true;
+    command->record = newRecord;
+    PrintUpdate(command);
     
     ts_rel = GetMicroTime();
     rwlock_release_writelock(lock);
     PrintLog(ts_rel, priority, "WRITE LOCK RELEASED");
 }
 
-// Deletes the record with the specified name from the hash table.
 int delete(HashTable *table, CommandInfo *command) {
     const char *name = command->name;
     int priority = command->priority;
@@ -76,15 +102,20 @@ int delete(HashTable *table, CommandInfo *command) {
     // Traverse the hash table to find the record
     while (curr != NULL) {
         if (curr->hash == hash) {
-            // Record found, delete it
+            // Record found - save info before deleting
+            command->succeeded = true;
+            command->record = curr;
+            command->salary = curr->salary;
+            
+            // Delete it
             if (prev == NULL) { // Deleting the first node
                 table->head = curr->next;
             } else {
                 prev->next = curr->next;
             }
-            free(curr);
-            command->succeeded = true;
+            
             PrintUpdate(command);
+            free(curr);
             break;
         }
         prev = curr;
@@ -105,7 +136,6 @@ int delete(HashTable *table, CommandInfo *command) {
     return 0;
 }
 
-// Updates the salary of the record with the specified name in the hash table.
 int updateSalary(HashTable *table, CommandInfo *command) {
     const char *name = command->name;
     uint32_t newSalary = command->salary;
@@ -140,6 +170,7 @@ int updateSalary(HashTable *table, CommandInfo *command) {
             curr->salary = newSalary;
             command->succeeded = true;
             command->record = curr;
+            command->oldSalary = oldSalary;  // Save old salary for printing
             command->salary = newSalary;
 
             // Log the updated record
@@ -197,7 +228,7 @@ void printTable(HashTable *table, CommandInfo *command) {
 
     printf("Current Database:\n");
     for (int i = 0; i < count; i++) {
-        printf("%u,%s,%u\n", arr[i]->hash, arr[i]->name, arr[i]->salary);
+        printf("%d,%s,%u\n", arr[i]->hash, arr[i]->name, arr[i]->salary);
     }
 
     free(arr);
@@ -207,10 +238,6 @@ void printTable(HashTable *table, CommandInfo *command) {
     PrintLog(ts_rel, priority, "READ LOCK RELEASED");
 }
 
-/*
-// Searches the table for the name within the command. Returns the record
-// if the name is found. Return NULL otherwise.
-*/
 hashRecord* search(HashTable *table, CommandInfo *command){
     
     const char *name = command->name;
@@ -219,7 +246,6 @@ hashRecord* search(HashTable *table, CommandInfo *command){
     int32_t hash = jenkins_one_at_a_time_hash((const uint8_t *)name, strlen(name));
 
     rwlock_t *lock = &table->lock;
-    // Track times around lock interactions
     long long ts_wait, ts_aqr, ts_rel;
 
     // Construct and save the primary log message
@@ -228,29 +254,27 @@ hashRecord* search(HashTable *table, CommandInfo *command){
     PrintLog(GetMicroTime(), priority, msg);
 
     // Set up rwlock and log
-    ts_wait= GetMicroTime();
+    ts_wait = GetMicroTime();
     rwlock_acquire_readlock(lock);
     ts_aqr = GetMicroTime();
     if((ts_aqr - ts_wait) > 10) PrintLog(ts_wait, priority, "WAITING FOR MY TURN");
-    // Simulate waiting & awakening
     PrintLog(ts_aqr, priority, "AWAKENED FOR WORK");
     PrintLog(ts_aqr, priority, "READ LOCK ACQUIRED");
 
     // Set up for traversal over hash table
     hashRecord *curr = table->head;
 
-    while(curr != NULL){ // Navigate to either the query node or the end of the list
-
+    while(curr != NULL){
         if(curr->hash == hash) break;
-
         curr = curr->next;
     }
 
-    if(curr != NULL){ // Save info in command for remaining logging
-
+    if(curr != NULL){
         command->succeeded = true;
         command->record = curr;
         command->salary = curr->salary;
+    } else {
+        command->succeeded = false;
     }
 
     PrintUpdate(command);
@@ -263,7 +287,6 @@ hashRecord* search(HashTable *table, CommandInfo *command){
     return curr;
 }
 
-// Cleans malloc'd space
 int freeTable(HashTable *table){
     
     hashRecord *curr = table->head;
