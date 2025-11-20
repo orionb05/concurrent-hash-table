@@ -31,7 +31,11 @@ int main(int argc, char *argv[]) {
         exit(1);
     }
     fclose(logFile);
-    
+    // We should def make a InitCommand() function to *reset*, *validate(error-wise)*, and *fill* each command.
+
+    // Ideally the runner would collect each command and set up
+    // each cmd and pass them to their respective functions.
+    // I included an insert() and search() call to show the calls.
     // Open commands file
     FILE *cmdFile = fopen("commands.txt", "r");
     if (cmdFile == NULL) {
