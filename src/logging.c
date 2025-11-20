@@ -13,7 +13,7 @@ void PrintUpdate(CommandInfo *command){
 
         case OP_INSERT:
             if(command->succeeded) {
-                printf("Inserted %d,%s,%u\n", record->hash, name, salary);
+                printf("Inserted %u,%s,%u\n", record->hash, name, salary);
             } else {
                 printf("Insert failed.  Entry %d is a duplicate.\n", record->hash);
             }
@@ -21,7 +21,7 @@ void PrintUpdate(CommandInfo *command){
             
         case OP_UPDATE:
             if(command->succeeded) {
-                printf("Updated record %d from %d,%s,%u to %d,%s,%u\n", 
+                printf("Updated record %u from %u,%s,%u to %d,%s,%u\n", 
                        record->hash, record->hash, name, command->oldSalary,
                        record->hash, name, salary);
             } else {
@@ -32,7 +32,7 @@ void PrintUpdate(CommandInfo *command){
             
         case OP_DELETE:
             if(command->succeeded) {
-                printf("Deleted record for %d,%s,%u\n", record->hash, name, salary);
+                printf("Deleted record for %u,%s,%u\n", record->hash, name, salary);
             } else {
                 printf("Delete failed. Entry not found.\n");
             }
@@ -40,7 +40,7 @@ void PrintUpdate(CommandInfo *command){
             
         case OP_SEARCH:
             if(command->succeeded) {
-                printf("Found: %d,%s,%u\n", record->hash, name, salary);
+                printf("Found: %u,%s,%u\n", record->hash, name, salary);
             } else {
                 printf("%s not found.\n", name);
             }
@@ -70,4 +70,33 @@ void PrintLog(long long timestamp, int priority, const char *message){
     fclose(fl);
 }
 
-void PrintResults(){}
+int cmp(const void *a, const void *b) {
+    hashRecord *ha = *(hashRecord**)a;
+    hashRecord *hb = *(hashRecord**)b;
+    return (ha->hash > hb->hash) - (ha->hash < hb->hash);
+}
+
+void PrintResults(HashTable *table) {
+    printf("Current Database:\n");
+    int count = 0;
+    hashRecord *curr = table->head;
+    while (curr) {
+        count++;
+        curr = curr->next;
+    }
+    
+    hashRecord **arr = malloc(sizeof(hashRecord*) * count);
+    curr = table->head;
+    for (int i = 0; i < count; i++) {
+        arr[i] = curr;
+        curr = curr->next;
+    }
+
+    qsort(arr, count, sizeof(hashRecord*), cmp);
+
+    for (int i = 0; i < count; i++) {
+        printf("%u,%s,%u\n", arr[i]->hash, arr[i]->name, arr[i]->salary);
+    }
+
+    free(arr);
+}

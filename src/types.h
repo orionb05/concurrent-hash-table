@@ -21,7 +21,7 @@ typedef enum {
 // Base node for the hashtable
 typedef struct hash_struct
 {
-  int32_t hash;
+  uint32_t hash;
   char name[50];
   uint32_t salary;
   struct hash_struct *next;

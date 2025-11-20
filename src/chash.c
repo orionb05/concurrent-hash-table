@@ -133,8 +133,8 @@ int main(int argc, char *argv[]) {
     qsort(arr, count, sizeof(hashRecord*), cmp);
     
     for (int i = 0; i < count; i++) {
-        printf("%d,%s,%u\n", arr[i]->hash, arr[i]->name, arr[i]->salary);
-        fprintf(logFile2, "%d,%s,%u\n", arr[i]->hash, arr[i]->name, arr[i]->salary);
+        printf("%u,%s,%u\n", arr[i]->hash, arr[i]->name, arr[i]->salary);
+        fprintf(logFile2, "%u,%s,%u\n", arr[i]->hash, arr[i]->name, arr[i]->salary);
     }
     
     fclose(logFile2);

@@ -19,6 +19,6 @@ void PrintUpdate(CommandInfo *command);
 
 void PrintLog(long long timestamp, int priority, const char *message);
 
-void PrintResults();
+void PrintResults(HashTable *table);
 
 #endif
