@@ -107,10 +107,6 @@ int main(int argc, char *argv[]) {
     }
     
     // Print final statistics to both stdout and log file
-    printf("\nNumber of lock acquisitions: %d\n", readLockCount + writeLockCount);
-    printf("Number of lock releases: %d\n", readLockCount + writeLockCount);
-    printf("Final Table:\n");
-    
     fprintf(logFile2, "\nNumber of lock acquisitions: %d\n", readLockCount + writeLockCount);
     fprintf(logFile2, "Number of lock releases: %d\n", readLockCount + writeLockCount);
     fprintf(logFile2, "Final Table:\n");
@@ -133,7 +129,6 @@ int main(int argc, char *argv[]) {
     qsort(arr, count, sizeof(hashRecord*), cmp);
     
     for (int i = 0; i < count; i++) {
-        printf("%u,%s,%u\n", arr[i]->hash, arr[i]->name, arr[i]->salary);
         fprintf(logFile2, "%u,%s,%u\n", arr[i]->hash, arr[i]->name, arr[i]->salary);
     }
     
