@@ -12,6 +12,7 @@ void rwlock_acquire_readlock(rwlock_t *lock) {
     if (lock->readers == 1)
 	Sem_wait(&lock->writelock);
     Sem_post(&lock->lock);
+    // lock->acquisitions++;
 }
 
 void rwlock_release_readlock(rwlock_t *lock) {
@@ -20,14 +21,17 @@ void rwlock_release_readlock(rwlock_t *lock) {
     if (lock->readers == 0)
 	Sem_post(&lock->writelock);
     Sem_post(&lock->lock);
+    // lock->acquisitions++;
 }
 
 void rwlock_acquire_writelock(rwlock_t *lock) {
     Sem_wait(&lock->writelock);
+    // lock->acquisitions++;
 }
 
 void rwlock_release_writelock(rwlock_t *lock) {
     Sem_post(&lock->writelock);
+    // lock->acquisitions++;
 }
     
 
