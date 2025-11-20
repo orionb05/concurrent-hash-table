@@ -2,8 +2,8 @@
 
 long long GetMicroTime() {  
     struct timeval te;  
-    gettimeofday(&te, NULL);
-    long long microseconds = (te.tv_sec * 1000000) + te.tv_usec;
+    gettimeofday(&te, NULL); // get current time 
+    long long microseconds = (te.tv_sec * 1000000) + te.tv_usec;// calculate milliseconds  
     return microseconds;  
 } 
 
