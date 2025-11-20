@@ -15,13 +15,13 @@ void PrintUpdate(CommandInfo *command){
             if(command->succeeded) {
                 printf("Inserted %u,%s,%u\n", record->hash, name, salary);
             } else {
-                printf("Insert failed.  Entry %d is a duplicate.\n", record->hash);
+                printf("Insert failed.  Entry %u is a duplicate.\n", record->hash);
             }
             break;
             
         case OP_UPDATE:
             if(command->succeeded) {
-                printf("Updated record %u from %u,%s,%u to %d,%s,%u\n", 
+                printf("Updated record %u from %u,%s,%u to %u,%s,%u\n", 
                        record->hash, record->hash, name, command->oldSalary,
                        record->hash, name, salary);
             } else {
