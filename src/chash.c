@@ -31,11 +31,6 @@ int main(int argc, char *argv[]) {
         exit(1);
     }
     fclose(logFile);
-     // We should def make a InitCommand() function to *reset*, *validate(error-wise)*, and *fill* each command.
-
-    // Ideally the runner would collect each command and set up
-    // each cmd and pass them to their respective functions.
-    // I included an insert() and search() call to show the calls.
     
     // Open commands file
     FILE *cmdFile = fopen("commands.txt", "r");
@@ -100,10 +95,21 @@ int main(int argc, char *argv[]) {
     
     fclose(cmdFile);
     
-    // Print final statistics
+    // Open log file for appending final statistics
+    FILE *logFile2 = fopen("hash.log", "a");
+    if (logFile2 == NULL) {
+        perror("Error: failed to open log file");
+        exit(1);
+    }
+    
+    // Print final statistics to both stdout and log file
     printf("\nNumber of lock acquisitions: %d\n", readLockCount + writeLockCount);
     printf("Number of lock releases: %d\n", readLockCount + writeLockCount);
     printf("Final Table:\n");
+    
+    fprintf(logFile2, "\nNumber of lock acquisitions: %d\n", readLockCount + writeLockCount);
+    fprintf(logFile2, "Number of lock releases: %d\n", readLockCount + writeLockCount);
+    fprintf(logFile2, "Final Table:\n");
     
     // Print final table (sorted)
     int count = 0;
@@ -124,8 +130,10 @@ int main(int argc, char *argv[]) {
     
     for (int i = 0; i < count; i++) {
         printf("%d,%s,%u\n", arr[i]->hash, arr[i]->name, arr[i]->salary);
+        fprintf(logFile2, "%d,%s,%u\n", arr[i]->hash, arr[i]->name, arr[i]->salary);
     }
     
+    fclose(logFile2);
     free(arr);
     freeTable(&table);
     
