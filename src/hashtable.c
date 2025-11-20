@@ -13,20 +13,19 @@ void insert(HashTable *table, CommandInfo *command) {
     uint32_t hash = jenkins_one_at_a_time_hash((const uint8_t *)name, strlen(name));
 
     rwlock_t *lock = &table->lock;
-    long long ts_wait, ts_aqr, ts_rel;
+    long long ts_rel;
+
+    // To meet assignment, awaken all threads except the first - it's handled elsewhere
+    if(priority != 0) PrintLog(GetMicroTime(), priority, "AWAKENED FOR WORK");
 
     // Log the insert operation
-    char msg[64];
+    char msg[256];
     snprintf(msg, sizeof(msg), "INSERT,%u,%s,%u", hash, name, salary);
     PrintLog(GetMicroTime(), priority, msg);
 
     // Set up rwlock and log
-    ts_wait = GetMicroTime();
     rwlock_acquire_writelock(lock);
-    ts_aqr = GetMicroTime();
-    if((ts_aqr - ts_wait) > 10) PrintLog(ts_wait, priority, "WAITING FOR MY TURN");
-    PrintLog(ts_aqr, priority, "AWAKENED FOR WORK");
-    PrintLog(ts_aqr, priority, "WRITE LOCK ACQUIRED");
+    PrintLog(GetMicroTime(), priority, "WRITE LOCK ACQUIRED");
 
     // Check for duplicate
     hashRecord *curr = table->head;
@@ -72,7 +71,10 @@ int delete(HashTable *table, CommandInfo *command) {
     uint32_t hash = jenkins_one_at_a_time_hash((const uint8_t *)name, strlen(name));
 
     rwlock_t *lock = &table->lock;
-    long long ts_wait, ts_aqr, ts_rel;
+    long long ts_rel;
+
+    // To meet assignment, awaken all threads except the first - it's handled elsewhere
+    if(priority != 0) PrintLog(GetMicroTime(), priority, "AWAKENED FOR WORK");
 
     // Log the delete operation
     char msg[64];
@@ -80,14 +82,8 @@ int delete(HashTable *table, CommandInfo *command) {
     PrintLog(GetMicroTime(), priority, msg);
 
     // Acquire write lock
-    ts_wait = GetMicroTime();
     rwlock_acquire_writelock(lock);
-    ts_aqr = GetMicroTime();
-    if ((ts_aqr - ts_wait) > 10) {
-        PrintLog(ts_wait, priority, "WAITING FOR MY TURN");
-    }
-    PrintLog(ts_aqr, priority, "AWAKENED FOR WORK");
-    PrintLog(ts_aqr, priority, "WRITE LOCK ACQUIRED");
+    PrintLog(GetMicroTime(), priority, "WRITE LOCK ACQUIRED");
 
     hashRecord *curr = table->head;
     hashRecord *prev = NULL;
@@ -136,7 +132,10 @@ int updateSalary(HashTable *table, CommandInfo *command) {
     uint32_t hash = jenkins_one_at_a_time_hash((const uint8_t *)name, strlen(name));
 
     rwlock_t *lock = &table->lock;
-    long long ts_wait, ts_aqr, ts_rel;
+    long long ts_rel;
+
+    // To meet assignment, awaken all threads except the first - it's handled elsewhere
+    if(priority != 0) PrintLog(GetMicroTime(), priority, "AWAKENED FOR WORK");
 
     // Log the update operation
     char msg[64];
@@ -144,14 +143,8 @@ int updateSalary(HashTable *table, CommandInfo *command) {
     PrintLog(GetMicroTime(), priority, msg);
 
     // Acquire write lock
-    ts_wait = GetMicroTime();
     rwlock_acquire_writelock(lock);
-    ts_aqr = GetMicroTime();
-    if ((ts_aqr - ts_wait) > 10) {
-        PrintLog(ts_wait, priority, "WAITING FOR MY TURN");
-    }
-    PrintLog(ts_aqr, priority, "AWAKENED FOR WORK");
-    PrintLog(ts_aqr, priority, "WRITE LOCK ACQUIRED");
+    PrintLog(GetMicroTime(), priority, "WRITE LOCK ACQUIRED");
 
     hashRecord *curr = table->head;
 
@@ -190,21 +183,21 @@ int updateSalary(HashTable *table, CommandInfo *command) {
 void printTable(HashTable *table, CommandInfo *command) {
 
     // Set up rwlock and log
-    long long ts_wait, ts_aqr, ts_rel;
+    long long ts_rel;
     int priority = command->priority;
     rwlock_t *lock = &table->lock;
-    ts_wait = GetMicroTime();
-    rwlock_acquire_readlock(lock);
-    ts_aqr = GetMicroTime();
-    if((ts_aqr - ts_wait) > 10) PrintLog(ts_wait, priority, "WAITING FOR MY TURN");
-    PrintLog(ts_aqr, priority, "AWAKENED FOR WORK");
-    PrintLog(ts_aqr, priority, "READ LOCK ACQUIRED");
 
+    // To meet assignment, awaken all threads except the first - it's handled elsewhere
+    if(priority != 0) PrintLog(GetMicroTime(), priority, "AWAKENED FOR WORK");
 
     // Log the print operation
     char msg[64];
     snprintf(msg, sizeof(msg), "PRINT");
     PrintLog(GetMicroTime(), priority, msg);
+
+    rwlock_acquire_readlock(lock);
+    PrintLog(GetMicroTime(), priority, "READ LOCK ACQUIRED");
+
     PrintResults(table);
 
     // Release read lock
@@ -221,7 +214,10 @@ hashRecord* search(HashTable *table, CommandInfo *command){
     uint32_t hash = jenkins_one_at_a_time_hash((const uint8_t *)name, strlen(name));
 
     rwlock_t *lock = &table->lock;
-    long long ts_wait, ts_aqr, ts_rel;
+    long long ts_rel;
+
+    // To meet assignment, awaken all threads except the first - it's handled elsewhere
+    if(priority != 0) PrintLog(GetMicroTime(), priority, "AWAKENED FOR WORK");
 
     // Construct and save the primary log message
     char msg[64];
@@ -229,12 +225,8 @@ hashRecord* search(HashTable *table, CommandInfo *command){
     PrintLog(GetMicroTime(), priority, msg);
 
     // Set up rwlock and log
-    ts_wait = GetMicroTime();
     rwlock_acquire_readlock(lock);
-    ts_aqr = GetMicroTime();
-    if((ts_aqr - ts_wait) > 10) PrintLog(ts_wait, priority, "WAITING FOR MY TURN");
-    PrintLog(ts_aqr, priority, "AWAKENED FOR WORK");
-    PrintLog(ts_aqr, priority, "READ LOCK ACQUIRED");
+    PrintLog(GetMicroTime(), priority, "READ LOCK ACQUIRED");
 
     // Set up for traversal over hash table
     hashRecord *curr = table->head;

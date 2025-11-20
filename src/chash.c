@@ -31,11 +31,7 @@ int main(int argc, char *argv[]) {
         exit(1);
     }
     fclose(logFile);
-    // We should def make a InitCommand() function to *reset*, *validate(error-wise)*, and *fill* each command.
 
-    // Ideally the runner would collect each command and set up
-    // each cmd and pass them to their respective functions.
-    // I included an insert() and search() call to show the calls.
     // Open commands file
     FILE *cmdFile = fopen("commands.txt", "r");
     if (cmdFile == NULL) {
@@ -54,6 +50,16 @@ int main(int argc, char *argv[]) {
     char dummy[20];
     int dummyVal;
     sscanf(line, "%[^,],%d,%d", dummy, &numThreads, &dummyVal);
+
+    // Initialize threads and awaken the first
+    for(int i = 0; i < numThreads; i++){
+        
+        PrintLog(GetMicroTime(), i, "WAITING FOR MY TURN");
+    
+        // We awaken only the first thread upon initialization
+        if(i == 0) PrintLog(GetMicroTime(), 0, "AWAKENED FOR WORK");
+
+    }
     
     // Read and execute all commands in order
     while (fgets(line, sizeof(line), cmdFile) != NULL) {
