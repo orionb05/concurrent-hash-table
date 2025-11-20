@@ -188,9 +188,29 @@ int updateSalary(HashTable *table, CommandInfo *command) {
 }
 
 void printTable(HashTable *table, CommandInfo *command) {
+
+    // Set up rwlock and log
+    long long ts_wait, ts_aqr, ts_rel;
+    int priority = command->priority;
+    rwlock_t *lock = &table->lock;
+    ts_wait = GetMicroTime();
+    rwlock_acquire_readlock(lock);
+    ts_aqr = GetMicroTime();
+    if((ts_aqr - ts_wait) > 10) PrintLog(ts_wait, priority, "WAITING FOR MY TURN");
+    PrintLog(ts_aqr, priority, "AWAKENED FOR WORK");
+    PrintLog(ts_aqr, priority, "READ LOCK ACQUIRED");
+
+
+    // Log the print operation
     char msg[64];
     snprintf(msg, sizeof(msg), "PRINT");
+    PrintLog(GetMicroTime(), priority, msg);
     PrintResults(table);
+
+    // Release read lock
+    ts_rel = GetMicroTime();
+    rwlock_release_readlock(lock);
+    PrintLog(ts_rel, priority, "READ LOCK RELEASED");
 }
 
 hashRecord* search(HashTable *table, CommandInfo *command){
